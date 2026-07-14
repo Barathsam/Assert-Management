@@ -1,0 +1,67 @@
+extends layout
+
+block content
+  .d-flex.align-items-center.justify-content-between.mb-3
+    h1.page-title Dashboard
+    div
+      a.btn.btn-primary.btn-sm(href="/assets/new")
+        i.bi.bi-plus-lg.me-1
+        | Add Asset
+
+  .row.g-3.mb-4
+    .col-6.col-lg
+      .card.kpi.h-100: .card-body
+        .kpi-label Total Assets
+        .kpi-value= stats.totalAssets
+        .kpi-sub excludes scrapped
+    .col-6.col-lg
+      .card.kpi.h-100.border-success: .card-body
+        .kpi-label In Stock
+        .kpi-value.text-success= stats.inStock
+        .kpi-sub ready to issue
+    .col-6.col-lg
+      .card.kpi.h-100.border-primary: .card-body
+        .kpi-label Issued
+        .kpi-value.text-primary= stats.issued
+        .kpi-sub with employees
+    .col-6.col-lg
+      .card.kpi.h-100.border-warning: .card-body
+        .kpi-label In Repair
+        .kpi-value.text-warning= stats.inRepair
+        .kpi-sub not issuable
+    .col-6.col-lg
+      .card.kpi.h-100: .card-body
+        .kpi-label Asset Value
+        .kpi-value= money(stats.totalValue)
+        .kpi-sub at purchase cost
+    .col-6.col-lg
+      .card.kpi.h-100: .card-body
+        .kpi-label Scrapped
+        .kpi-value.text-secondary= stats.scrapped
+        .kpi-sub reports only
+
+  .card
+    .card-header.bg-white.fw-semibold Recent Activity
+    .table-responsive
+      table.table.table-sm.table-hover.mb-0
+        thead.table-light
+          tr
+            th Date
+            th Asset
+            th Event
+            th Employee
+            th.text-end Amount
+        tbody
+          if !recent.length
+            tr: td.text-center.text-muted.py-4(colspan="5") No activity yet.
+          each t in recent
+            tr
+              td.text-nowrap= date(t.txnAt)
+              td
+                a.mono(href=`/reports/history/${t.assetId}`)= t.asset ? t.asset.assetTag : t.assetId
+              td
+                span.badge.bg-light.text-dark= TXN_LABEL[t.txnType]
+                if t.returnReason
+                  span.text-muted.small.ms-1= `(${RETURN_REASON_LABEL[t.returnReason]})`
+              td= t.employee ? `${t.employee.firstName} ${t.employee.lastName}` : '—'
+              td.text-end= t.amount ? money(t.amount) : '—'

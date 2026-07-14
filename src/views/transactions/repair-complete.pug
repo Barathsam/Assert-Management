@@ -1,0 +1,35 @@
+extends ../layout
+
+include ../partials/asset-summary
+
+block content
+  .row.justify-content-center
+    .col-lg-7
+      h1.page-title.mb-3 Repair Complete
+
+      +assetSummary(asset)
+
+      .card: .card-body
+        form(method="post" action=`/assets/${asset.id}/repair-complete` data-once)
+          p.text-muted.small
+            | The asset goes back into stock and becomes issuable again.
+
+          .row
+            .col-md-4.mb-3
+              label.form-label Date *
+              input.form-control(type="date" name="date" required value=today max=today)
+            .col-md-4.mb-3
+              label.form-label Repair Cost (₹)
+              input.form-control(type="number" name="cost" min="0" step="0.01" value="0")
+              //- This is why IN_REPAIR is a real state: without a repair-complete event, the
+              //- repair bill has nowhere to live and silently vanishes from the asset's cost.
+              .form-text Added to this asset's total cost of ownership.
+            .col-md-4.mb-3
+              label.form-label Vendor
+              input.form-control(name="vendor" placeholder="Acme Services")
+          .mb-3
+            label.form-label Remarks
+            input.form-control(name="remarks" placeholder="Keyboard replaced")
+          .d-flex.justify-content-end.gap-2
+            a.btn.btn-outline-secondary(href=`/assets/${asset.id}`) Cancel
+            button.btn.btn-primary(type="submit") Mark Repaired

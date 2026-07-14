@@ -1,0 +1,36 @@
+extends ../layout
+
+block content
+  .mb-3
+    h1.page-title Ledger Integrity
+    .text-muted.small
+      | Each asset's <code>status</code> is a cached copy of where its ledger says it ended up.
+      |  This page lists any asset where the two disagree. An empty table is the correct result.
+
+  if !drift.length
+    .card.border-success: .card-body.text-center.py-5
+      i.bi.bi-shield-check.text-success(style="font-size:2.5rem")
+      h2.h5.mt-3.mb-1 No drift
+      p.text-muted.mb-0
+        | Every asset's current status matches the last event in its history.
+
+  else
+    .alert.alert-danger
+      strong #{drift.length} asset(s) have drifted from their ledger.
+      |  The ledger is the record of what actually happened — trust it over the status column.
+    .card: .table-responsive
+      table.table.table-hover.mb-0
+        thead.table-light
+          tr
+            th Asset Tag
+            th Status Column Says
+            th Ledger Says
+            th.no-sort
+        tbody
+          each d in drift
+            tr.table-danger
+              td: span.mono= d.assetTag
+              td= d.assetStatus
+              td= d.ledgerStatus || '— (no transactions)'
+              td.text-end
+                a.btn.btn-sm.btn-outline-secondary(href=`/reports/history/${d.assetId}`) History

@@ -1,0 +1,31 @@
+extends ../layout
+
+include ../partials/asset-summary
+
+block content
+  .row.justify-content-center
+    .col-lg-7
+      h1.page-title.mb-3 Issue Asset
+
+      +assetSummary(asset)
+
+      .card: .card-body
+        form(method="post" action=`/assets/${asset.id}/issue` data-once)
+          .mb-3
+            label.form-label Issue To *
+            select.form-select(name="employeeId" required)
+              option(value="") Select an employee…
+              each e in employees
+                option(value=e.id)= `${e.employeeCode} — ${e.firstName} ${e.lastName}${e.branch ? ' (' + e.branch.name + ')' : ''}`
+            //- Inactive employees are absent from this list and are rejected server-side too.
+            .form-text Only active employees are listed.
+          .row
+            .col-md-5.mb-3
+              label.form-label Issue Date *
+              input.form-control(type="date" name="issueDate" required value=today max=today)
+            .col-md-7.mb-3
+              label.form-label Remarks
+              input.form-control(name="remarks" placeholder="New joiner allocation")
+          .d-flex.justify-content-end.gap-2
+            a.btn.btn-outline-secondary(href="/issue") Cancel
+            button.btn.btn-primary(type="submit") Issue Asset

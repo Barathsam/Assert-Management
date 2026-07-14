@@ -1,0 +1,66 @@
+extends ../layout
+
+block content
+  .d-flex.align-items-center.justify-content-between.mb-3
+    h1.page-title Employees
+    a.btn.btn-primary.btn-sm(href="/employees/new")
+      i.bi.bi-plus-lg.me-1
+      | Add Employee
+
+  //- Requirement 1: filters for active/inactive, plus search.
+  .card.mb-3: .card-body.py-3
+    form.row.g-2.align-items-end(method="get")
+      .col-md-3
+        label.form-label.small.fw-semibold Status
+        .btn-group.w-100(role="group")
+          each opt in [['active','Active'],['inactive','Inactive'],['all','All']]
+            input.btn-check(type="radio" name="status" id=`st-${opt[0]}` value=opt[0] checked=(filters.status === opt[0]) onchange="this.form.submit()")
+            label.btn.btn-outline-secondary.btn-sm(for=`st-${opt[0]}`)= opt[1]
+      .col-md-3
+        label.form-label.small.fw-semibold Branch
+        select.form-select.form-select-sm(name="branchId" onchange="this.form.submit()")
+          option(value="") All branches
+          each b in branches
+            option(value=b.id selected=(filters.branchId === b.id))= b.name
+      .col-md-4
+        label.form-label.small.fw-semibold Search
+        input.form-control.form-control-sm(name="q" value=filters.q placeholder="Name, code, email, designation…")
+      .col-md-2
+        button.btn.btn-secondary.btn-sm.w-100(type="submit") Apply
+
+  .card: .table-responsive
+    table.table.table-hover.mb-0(data-table data-order='[[0,"asc"]]')
+      thead.table-light
+        tr
+          th Code
+          th Name
+          th Designation
+          th Department
+          th Branch
+          th.text-center Assets Held
+          th Status
+          th.no-sort.text-end Actions
+      tbody
+        each e in employees
+          tr
+            td: span.mono= e.employeeCode
+            td.fw-medium
+              a(href=`/employees/${e.id}`)= `${e.firstName} ${e.lastName}`
+              if e.email
+                .text-muted.small= e.email
+            td= e.designation || '—'
+            td= e.department || '—'
+            td= e.branch ? e.branch.name : '—'
+            td.text-center
+              if e.heldAssets && e.heldAssets.length
+                span.badge.bg-primary= e.heldAssets.length
+              else
+                span.text-muted 0
+            td
+              if e.isActive
+                span.badge.bg-success Active
+              else
+                span.badge.bg-secondary Inactive
+            td.text-end
+              a.btn.btn-sm.btn-outline-secondary(href=`/employees/${e.id}`) View
+              a.btn.btn-sm.btn-outline-secondary.ms-1(href=`/employees/${e.id}/edit`) Edit

@@ -1,0 +1,90 @@
+extends ../layout
+
+block content
+  .d-flex.align-items-center.justify-content-between.mb-3
+    div
+      h1.page-title Asset Categories
+      .text-muted.small The hardware types in use — Laptop, Mobile Phone, Drill Machine, and so on.
+    button.btn.btn-primary.btn-sm(data-bs-toggle="modal" data-bs-target="#addCategory")
+      i.bi.bi-plus-lg.me-1
+      | Add Category
+
+  .card: .table-responsive
+    table.table.table-hover.mb-0(data-table data-order='[[1,"asc"]]')
+      thead.table-light
+        tr
+          th Code
+          th Name
+          th Description
+          th Status
+          th.no-sort.text-end Actions
+      tbody
+        each c in categories
+          tr
+            td: span.badge.bg-secondary.mono= c.code
+            td.fw-medium= c.name
+            td.text-muted= c.description || '—'
+            td
+              if c.isActive
+                span.badge.bg-success Active
+              else
+                span.badge.bg-secondary Inactive
+            td.text-end
+              button.btn.btn-sm.btn-outline-secondary(
+                data-bs-toggle="modal"
+                data-bs-target="#editCategory"
+                data-id=c.id data-code=c.code data-name=c.name data-description=c.description || ''
+              ) Edit
+              form.d-inline.ms-1(method="post" action=`/categories/${c.id}/toggle`)
+                button.btn.btn-sm.btn-outline-secondary(type="submit")= c.isActive ? 'Deactivate' : 'Activate'
+
+  //- Add
+  #addCategory.modal.fade: .modal-dialog: .modal-content
+    form(method="post" action="/categories" data-once)
+      .modal-header
+        h5.modal-title Add Category
+        button.btn-close(type="button" data-bs-dismiss="modal")
+      .modal-body
+        .mb-3
+          label.form-label Code
+          input.form-control.text-uppercase(name="code" required maxlength="8" placeholder="LAP")
+          .form-text Used as the prefix of every asset tag in this category.
+        .mb-3
+          label.form-label Name
+          input.form-control(name="name" required placeholder="Laptop")
+        .mb-3
+          label.form-label Description
+          textarea.form-control(name="description" rows="2")
+      .modal-footer
+        button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Cancel
+        button.btn.btn-primary(type="submit") Save
+
+  //- Edit
+  #editCategory.modal.fade: .modal-dialog: .modal-content
+    form#editCategoryForm(method="post" data-once)
+      .modal-header
+        h5.modal-title Edit Category
+        button.btn-close(type="button" data-bs-dismiss="modal")
+      .modal-body
+        .mb-3
+          label.form-label Code
+          input#ec-code.form-control.text-uppercase(name="code" required maxlength="8")
+        .mb-3
+          label.form-label Name
+          input#ec-name.form-control(name="name" required)
+        .mb-3
+          label.form-label Description
+          textarea#ec-description.form-control(name="description" rows="2")
+      .modal-footer
+        button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Cancel
+        button.btn.btn-primary(type="submit") Save
+
+block scripts
+  script.
+    document.getElementById('editCategory').addEventListener('show.bs.modal', function (e) {
+      var b = e.relatedTarget;
+      document.getElementById('editCategoryForm').action = '/categories/' + b.dataset.id;
+      document.getElementById('ec-code').value = b.dataset.code;
+      document.getElementById('ec-name').value = b.dataset.name;
+      document.getElementById('ec-description').value = b.dataset.description;
+    });

@@ -1,0 +1,29 @@
+extends ../layout
+
+include ../partials/asset-summary
+
+block content
+  .row.justify-content-center
+    .col-lg-7
+      h1.page-title.mb-3 Send to Repair
+
+      +assetSummary(asset)
+
+      .card: .card-body
+        form(method="post" action=`/assets/${asset.id}/send-to-repair` data-once)
+          p.text-muted.small
+            | This asset will leave Stock View immediately, so nobody can be issued a faulty item
+            |  while it is away.
+          .row
+            .col-md-5.mb-3
+              label.form-label Date *
+              input.form-control(type="date" name="date" required value=today max=today)
+            .col-md-7.mb-3
+              label.form-label Repair Vendor
+              input.form-control(name="vendor" placeholder="Acme Services")
+          .mb-3
+            label.form-label Fault / Remarks
+            textarea.form-control(name="remarks" rows="2" placeholder="Keyboard not working")
+          .d-flex.justify-content-end.gap-2
+            a.btn.btn-outline-secondary(href=`/assets/${asset.id}`) Cancel
+            button.btn.btn-warning(type="submit") Send to Repair

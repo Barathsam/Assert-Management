@@ -1,0 +1,42 @@
+extends ../layout
+
+block content
+  .mb-3
+    h1.page-title Transaction Ledger
+    .text-muted.small
+      | Every lifecycle event ever recorded. This table is append-only — the database rejects any
+      |  attempt to update or delete a row.
+
+  .card: .table-responsive
+    table.table.table-sm.table-hover.mb-0(data-table data-order='[[0,"desc"]]' data-page-length="50")
+      thead.table-light
+        tr
+          th Date
+          th Asset
+          th Event
+          th From → To
+          th Employee
+          th Reason
+          th.text-end Amount
+          th Vendor
+          th Remarks
+      tbody
+        each t in transactions
+          tr
+            td.text-nowrap= date(t.txnAt)
+            td
+              a.mono(href=`/reports/history/${t.assetId}`)= t.asset ? t.asset.assetTag : t.assetId
+            td: span.badge.bg-light.text-dark= TXN_LABEL[t.txnType]
+            td.small.text-muted
+              = t.fromStatus ? STATUS_LABEL[t.fromStatus] : '—'
+              |  →
+              = STATUS_LABEL[t.toStatus]
+            td
+              if t.employee
+                a(href=`/employees/${t.employee.id}`)= `${t.employee.firstName} ${t.employee.lastName}`
+              else
+                span.text-muted —
+            td= t.returnReason ? RETURN_REASON_LABEL[t.returnReason] : '—'
+            td.text-end= t.amount ? money(t.amount) : '—'
+            td.small= t.vendor || '—'
+            td.small.text-muted= t.remarks || '—'

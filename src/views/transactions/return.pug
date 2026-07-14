@@ -1,0 +1,46 @@
+extends ../layout
+
+include ../partials/asset-summary
+
+block content
+  .row.justify-content-center
+    .col-lg-7
+      h1.page-title.mb-3 Return Asset
+
+      +assetSummary(asset)
+
+      .card: .card-body
+        form(method="post" action=`/assets/${asset.id}/return` data-once)
+
+          //- There is no "returned by" field. The holder is derived from the asset itself, which
+          //- makes "returned from the wrong employee" impossible to express.
+          .mb-3
+            label.form-label Returned By
+            input.form-control(value=asset.holder ? `${asset.holder.firstName} ${asset.holder.lastName} (${asset.holder.employeeCode})` : '—' disabled)
+
+          .mb-3
+            label.form-label Reason for Return *
+            select#returnReason.form-select(name="reason" required)
+              option(value="") Select a reason…
+              each r in reasons
+                option(value=r selected=(preselect === r))= RETURN_REASON_LABEL[r]
+
+          //- Repair and Damaged do NOT send the asset back to stock. Say so up front rather
+          //- than surprising the user after they submit.
+          #repairWarning.alert.alert-warning.small.d-none
+            i.bi.bi-tools.me-1
+            strong This asset will go to In Repair, not back to stock.
+            |  It will not appear in Stock View — and so cannot be issued to anyone —
+            |  until the repair is marked complete.
+
+          .row
+            .col-md-5.mb-3
+              label.form-label Return Date *
+              input.form-control(type="date" name="returnDate" required value=today max=today)
+            .col-md-7.mb-3
+              label.form-label Remarks
+              input.form-control(name="remarks" placeholder="Condition, fault details…")
+
+          .d-flex.justify-content-end.gap-2
+            a.btn.btn-outline-secondary(href="/return") Cancel
+            button.btn.btn-success(type="submit") Return Asset

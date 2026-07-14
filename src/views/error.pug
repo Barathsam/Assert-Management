@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  .row.justify-content-center
+    .col-lg-7
+      .card.border-danger
+        .card-body.text-center.py-5
+          i.bi.bi-exclamation-triangle.text-danger(style="font-size:2.5rem")
+          h1.h4.mt-3= title
+          p.text-muted.mb-4= message
+          a.btn.btn-outline-secondary(href="javascript:history.back()") Go back
+          a.btn.btn-primary.ms-2(href="/") Dashboard

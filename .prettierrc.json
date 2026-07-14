@@ -1,0 +1,15 @@
+{
+    "semi": false,
+    "singleQuote": true,
+    "trailingComma": "none",
+    "printWidth": 120,
+    "tabWidth": 4,
+    "arrowParens": "always",
+    "endOfLine": "lf",
+    "overrides": [
+        {
+            "files": ["migrations/**/*.js", "seeders/**/*.js", "config/*.js"],
+            "options": { "semi": true, "trailingComma": "all", "tabWidth": 2, "printWidth": 100 }
+        }
+    ]
+}

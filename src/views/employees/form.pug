@@ -1,0 +1,45 @@
+extends ../layout
+
+block content
+  .row.justify-content-center
+    .col-lg-8
+      h1.page-title.mb-3= title
+      .card: .card-body
+        form(method="post" action=employee ? `/employees/${employee.id}` : '/employees' data-once)
+          .row
+            .col-md-4.mb-3
+              label.form-label Employee Code *
+              input.form-control(name="employeeCode" required value=employee ? employee.employeeCode : '' placeholder="EMP0042")
+            .col-md-4.mb-3
+              label.form-label First Name *
+              input.form-control(name="firstName" required value=employee ? employee.firstName : '')
+            .col-md-4.mb-3
+              label.form-label Last Name *
+              input.form-control(name="lastName" required value=employee ? employee.lastName : '')
+          .row
+            .col-md-6.mb-3
+              label.form-label Email
+              input.form-control(type="email" name="email" value=employee ? employee.email || '' : '')
+            .col-md-6.mb-3
+              label.form-label Phone
+              input.form-control(name="phone" value=employee ? employee.phone || '' : '')
+          .row
+            .col-md-4.mb-3
+              label.form-label Designation
+              input.form-control(name="designation" value=employee ? employee.designation || '' : '')
+            .col-md-4.mb-3
+              label.form-label Department
+              input.form-control(name="department" value=employee ? employee.department || '' : '')
+            .col-md-4.mb-3
+              label.form-label Branch *
+              select.form-select(name="branchId" required)
+                option(value="") Select…
+                each b in branches
+                  option(value=b.id selected=(employee && employee.branchId === b.id))= b.name
+          .row
+            .col-md-4.mb-3
+              label.form-label Date of Joining
+              input.form-control(type="date" name="dateOfJoining" value=employee && employee.dateOfJoining ? employee.dateOfJoining : '' max=today)
+          .d-flex.justify-content-end.gap-2
+            a.btn.btn-outline-secondary(href=employee ? `/employees/${employee.id}` : '/employees') Cancel
+            button.btn.btn-primary(type="submit")= employee ? 'Save Changes' : 'Add Employee'

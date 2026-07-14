@@ -1,0 +1,43 @@
+services:
+    db:
+        image: postgres:16-alpine
+        container_name: am_db
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: asset_management
+            TZ: UTC
+        ports:
+            - '5433:5432' # 5433 on the host so we don't collide with a local Postgres
+        volumes:
+            - am_pgdata:/var/lib/postgresql/data
+        healthcheck:
+            # The app waits on this before running migrations.
+            test: ['CMD-SHELL', 'pg_isready -U postgres -d asset_management']
+            interval: 3s
+            timeout: 3s
+            retries: 20
+
+    app:
+        build: .
+        container_name: am_app
+        depends_on:
+            db:
+                condition: service_healthy
+        environment:
+            NODE_ENV: development
+            PORT: 3000
+            DB_HOST: db
+            DB_PORT: 5432
+            DB_NAME: asset_management
+            DB_USER: postgres
+            DB_PASSWORD: postgres
+            SESSION_SECRET: local-dev-secret
+            TZ: UTC
+        ports:
+            - '3000:3000'
+        # Migrate + seed on boot, then serve. Seeding is idempotent-by-truncate (see seeders).
+        command: sh -c "npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all && npm start"
+
+volumes:
+    am_pgdata:

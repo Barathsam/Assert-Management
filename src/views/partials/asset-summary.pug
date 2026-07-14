@@ -1,0 +1,23 @@
+//- The asset a transaction form is acting on. Shown on every issue/return/repair/scrap page so
+//- the operator can see exactly what they are about to act on before they commit to it.
+mixin assetSummary(asset)
+  .card.mb-3.bg-light: .card-body.py-3
+    .row.small
+      .col-md-3
+        .text-muted Asset Tag
+        .mono.fw-semibold= asset.assetTag
+      .col-md-3
+        .text-muted Serial
+        .mono= asset.serialNumber
+      .col-md-3
+        .text-muted Make / Model
+        div= `${asset.make} ${asset.model}`
+      .col-md-3
+        .text-muted Status
+        span(class=`badge bg-${STATUS_BADGE[asset.status]}`)= STATUS_LABEL[asset.status]
+    if asset.holder
+      hr.my-2
+      .small
+        span.text-muted Currently held by
+        strong= `${asset.holder.firstName} ${asset.holder.lastName}`
+        span.text-muted.mono.ms-1= `(${asset.holder.employeeCode})`

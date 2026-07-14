@@ -1,0 +1,17 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+        "types": ["node"]
+    },
+    "exclude": [
+        "node_modules",
+        "dist",
+        "migrations",
+        "seeders",
+        "src/**/*.test.ts",
+        "src/**/testFactory/**",
+        "src/**/seed/**",
+        "src/testSetup/**",
+        "src/__mocks__/**"
+    ]
+}

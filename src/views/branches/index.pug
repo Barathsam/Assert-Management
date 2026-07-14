@@ -1,0 +1,97 @@
+extends ../layout
+
+block content
+  .d-flex.align-items-center.justify-content-between.mb-3
+    div
+      h1.page-title Branches
+      .text-muted.small An asset's branch is where it is owned — Stock View totals are grouped by it.
+    button.btn.btn-primary.btn-sm(data-bs-toggle="modal" data-bs-target="#addBranch")
+      i.bi.bi-plus-lg.me-1
+      | Add Branch
+
+  .card: .table-responsive
+    table.table.table-hover.mb-0(data-table data-order='[[1,"asc"]]')
+      thead.table-light
+        tr
+          th Code
+          th Name
+          th City
+          th State
+          th Status
+          th.no-sort.text-end Actions
+      tbody
+        each b in branches
+          tr
+            td: span.badge.bg-secondary.mono= b.code
+            td.fw-medium= b.name
+            td= b.city || '—'
+            td= b.state || '—'
+            td
+              if b.isActive
+                span.badge.bg-success Active
+              else
+                span.badge.bg-secondary Inactive
+            td.text-end
+              button.btn.btn-sm.btn-outline-secondary(
+                data-bs-toggle="modal" data-bs-target="#editBranch"
+                data-id=b.id data-code=b.code data-name=b.name data-city=b.city || '' data-state=b.state || ''
+              ) Edit
+              form.d-inline.ms-1(method="post" action=`/branches/${b.id}/toggle`)
+                button.btn.btn-sm.btn-outline-secondary(type="submit")= b.isActive ? 'Deactivate' : 'Activate'
+
+  #addBranch.modal.fade: .modal-dialog: .modal-content
+    form(method="post" action="/branches" data-once)
+      .modal-header
+        h5.modal-title Add Branch
+        button.btn-close(type="button" data-bs-dismiss="modal")
+      .modal-body
+        .mb-3
+          label.form-label Code
+          input.form-control.text-uppercase(name="code" required maxlength="8" placeholder="BLR")
+        .mb-3
+          label.form-label Name
+          input.form-control(name="name" required placeholder="Bangalore HQ")
+        .row
+          .col-6.mb-3
+            label.form-label City
+            input.form-control(name="city")
+          .col-6.mb-3
+            label.form-label State
+            input.form-control(name="state")
+      .modal-footer
+        button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Cancel
+        button.btn.btn-primary(type="submit") Save
+
+  #editBranch.modal.fade: .modal-dialog: .modal-content
+    form#editBranchForm(method="post" data-once)
+      .modal-header
+        h5.modal-title Edit Branch
+        button.btn-close(type="button" data-bs-dismiss="modal")
+      .modal-body
+        .mb-3
+          label.form-label Code
+          input#eb-code.form-control.text-uppercase(name="code" required maxlength="8")
+        .mb-3
+          label.form-label Name
+          input#eb-name.form-control(name="name" required)
+        .row
+          .col-6.mb-3
+            label.form-label City
+            input#eb-city.form-control(name="city")
+          .col-6.mb-3
+            label.form-label State
+            input#eb-state.form-control(name="state")
+      .modal-footer
+        button.btn.btn-secondary(type="button" data-bs-dismiss="modal") Cancel
+        button.btn.btn-primary(type="submit") Save
+
+block scripts
+  script.
+    document.getElementById('editBranch').addEventListener('show.bs.modal', function (e) {
+      var b = e.relatedTarget;
+      document.getElementById('editBranchForm').action = '/branches/' + b.dataset.id;
+      document.getElementById('eb-code').value = b.dataset.code;
+      document.getElementById('eb-name').value = b.dataset.name;
+      document.getElementById('eb-city').value = b.dataset.city;
+      document.getElementById('eb-state').value = b.dataset.state;
+    });

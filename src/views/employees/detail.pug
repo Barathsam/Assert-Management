@@ -1,0 +1,80 @@
+extends ../layout
+
+block content
+  - var held = employee.heldAssets || []
+
+  .d-flex.align-items-center.justify-content-between.mb-3
+    div
+      h1.page-title
+        = `${employee.firstName} ${employee.lastName} `
+        if employee.isActive
+          span.badge.bg-success.align-middle Active
+        else
+          span.badge.bg-secondary.align-middle Inactive
+      .text-muted.small
+        span.mono= employee.employeeCode
+        if employee.designation
+          |  · #{employee.designation}
+        if employee.branch
+          |  · #{employee.branch.name}
+    div
+      a.btn.btn-outline-secondary.btn-sm(href=`/employees/${employee.id}/edit`) Edit
+      if employee.isActive
+        form.d-inline.ms-1(method="post" action=`/employees/${employee.id}/deactivate`)
+          button.btn.btn-outline-danger.btn-sm(type="submit") Deactivate
+      else
+        form.d-inline.ms-1(method="post" action=`/employees/${employee.id}/activate`)
+          button.btn.btn-outline-success.btn-sm(type="submit") Reactivate
+
+  .row.g-3
+    .col-lg-4
+      .card: .card-body
+        h2.h6.text-muted.text-uppercase.small.fw-semibold Details
+        dl.row.mb-0.small
+          dt.col-5.text-muted Email
+          dd.col-7= employee.email || '—'
+          dt.col-5.text-muted Phone
+          dd.col-7= employee.phone || '—'
+          dt.col-5.text-muted Department
+          dd.col-7= employee.department || '—'
+          dt.col-5.text-muted Joined
+          dd.col-7= date(employee.dateOfJoining)
+          if employee.dateOfExit
+            dt.col-5.text-muted Exited
+            dd.col-7= date(employee.dateOfExit)
+
+    .col-lg-8
+      .card
+        .card-header.bg-white.d-flex.justify-content-between.align-items-center
+          span.fw-semibold Assets Currently Held
+          span.badge.bg-primary= held.length
+
+        //- The deactivation guard is the reason this list is prominent: an employee cannot be
+        //- deactivated while they hold company property, so every row here is a blocker with
+        //- a one-click way to clear it.
+        if employee.isActive && held.length
+          .alert.alert-warning.small.mb-0.rounded-0.border-start-0.border-end-0
+            i.bi.bi-info-circle.me-1
+            | This employee cannot be deactivated until these assets are returned.
+
+        .table-responsive
+          table.table.table-sm.table-hover.mb-0
+            thead.table-light
+              tr
+                th Asset Tag
+                th Serial
+                th Category
+                th Make / Model
+                th.no-sort.text-end Action
+            tbody
+              if !held.length
+                tr: td.text-center.text-muted.py-4(colspan="5") No assets currently held.
+              each a in held
+                tr
+                  td: a.mono(href=`/assets/${a.id}`)= a.assetTag
+                  td.mono.text-muted= a.serialNumber
+                  td= a.category ? a.category.name : '—'
+                  td= `${a.make} ${a.model}`
+                  td.text-end
+                    //- Pre-fills the reason, so returning a resignee's kit is one click per asset.
+                    a.btn.btn-sm.btn-outline-primary(href=`/assets/${a.id}/return?reason=RESIGNATION`) Return

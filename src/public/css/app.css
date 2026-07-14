@@ -1,0 +1,103 @@
+:root {
+    --am-muted: #6c757d;
+}
+
+body {
+    background: #f5f6f8;
+    font-size: 0.925rem;
+}
+
+.card {
+    border: 1px solid #e3e6ea;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 4%);
+}
+
+.page-title {
+    font-size: 1.35rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* KPI cards on the dashboard and the asset-history totals strip. */
+.kpi .kpi-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--am-muted);
+    font-weight: 600;
+}
+
+.kpi .kpi-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.kpi .kpi-sub {
+    font-size: 0.75rem;
+    color: var(--am-muted);
+}
+
+table.dataTable tbody td {
+    vertical-align: middle;
+}
+
+.mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.85em;
+}
+
+/* Asset History timeline. */
+.timeline {
+    position: relative;
+    padding-left: 1.75rem;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.45rem;
+    top: 0.3rem;
+    bottom: 0.3rem;
+    width: 2px;
+    background: #dfe3e8;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 1.1rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -1.47rem;
+    top: 0.35rem;
+    width: 0.7rem;
+    height: 0.7rem;
+    border-radius: 50%;
+    background: #adb5bd;
+    border: 2px solid #fff;
+    box-shadow: 0 0 0 2px #dfe3e8;
+}
+
+.timeline-item.ev-PURCHASE::before {
+    background: #0d6efd;
+}
+.timeline-item.ev-ISSUE::before {
+    background: #6610f2;
+}
+.timeline-item.ev-RETURN::before {
+    background: #198754;
+}
+.timeline-item.ev-SEND_TO_REPAIR::before,
+.timeline-item.ev-REPAIR_COMPLETE::before {
+    background: #fd7e14;
+}
+.timeline-item.ev-SCRAP::before {
+    background: #dc3545;
+}
+
+.scrapped-banner {
+    border-left: 4px solid #dc3545;
+}

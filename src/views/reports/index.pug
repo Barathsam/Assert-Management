@@ -1,0 +1,23 @@
+extends ../layout
+
+block content
+  .mb-3
+    h1.page-title Reports
+    .text-muted.small Reports are the only place scrapped assets remain visible.
+
+  .row.g-3
+    .col-md-4
+      a.card.h-100.text-decoration-none.text-body(href="/reports/scrapped"): .card-body
+        i.bi.bi-trash.text-danger(style="font-size:1.6rem")
+        h2.h6.mt-2.mb-1 Scrap Register
+        p.text-muted.small.mb-0 Every scrapped asset, what it cost, and what was recovered.
+    .col-md-4
+      a.card.h-100.text-decoration-none.text-body(href="/reports/ledger"): .card-body
+        i.bi.bi-journal-text.text-primary(style="font-size:1.6rem")
+        h2.h6.mt-2.mb-1 Transaction Ledger
+        p.text-muted.small.mb-0 Every lifecycle event across every asset, newest first.
+    .col-md-4
+      a.card.h-100.text-decoration-none.text-body(href="/reports/integrity"): .card-body
+        i.bi.bi-shield-check.text-success(style="font-size:1.6rem")
+        h2.h6.mt-2.mb-1 Ledger Integrity
+        p.text-muted.small.mb-0 Proves every asset's status matches its transaction history.

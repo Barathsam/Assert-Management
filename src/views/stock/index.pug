@@ -1,0 +1,58 @@
+extends ../layout
+
+block content
+  .mb-3
+    h1.page-title Stock View
+    .text-muted.small
+      | Assets ready to give to an employee. Issued, in-repair and scrapped assets are excluded —
+      |  an asset in repair is owned, but it is not stock.
+
+  .row.g-3.mb-3
+    each b in stock.byBranch
+      .col-6.col-lg-3
+        .card.kpi.h-100: .card-body
+          .kpi-label= b.branchName
+          .kpi-value= b.qty
+          .kpi-sub= money(b.value)
+
+  .card.mb-3: .card-body.py-3
+    form.row.g-2.align-items-end(method="get")
+      .col-md-3
+        label.form-label.small.fw-semibold Branch
+        select.form-select.form-select-sm(name="branchId" onchange="this.form.submit()")
+          option(value="") All branches
+          each b in branches
+            option(value=b.id selected=(filters.branchId === b.id))= b.name
+      .col-md-3
+        label.form-label.small.fw-semibold Asset Type
+        select.form-select.form-select-sm(name="categoryId" onchange="this.form.submit()")
+          option(value="") All types
+          each c in categories
+            option(value=c.id selected=(filters.categoryId === c.id))= c.name
+      .col-md-2
+        a.btn.btn-outline-secondary.btn-sm.w-100(href="/stock") Clear
+
+  .card: .table-responsive
+    table.table.table-hover.mb-0
+      thead.table-light
+        tr
+          th Branch
+          th Asset Type
+          th.text-end Quantity
+          th.text-end Value
+      tbody
+        if !stock.rows.length
+          tr: td.text-center.text-muted.py-4(colspan="4") Nothing in stock for this filter.
+        each r in stock.rows
+          tr
+            td= r.branchName
+            td= r.categoryName
+            td.text-end= r.qty
+            td.text-end= money(r.value)
+      //- Requirement 4: totals by branch, with the total value in the footer.
+      //- These come from the server, summed in SQL — not from adding up the rendered cells.
+      tfoot.table-light.fw-semibold
+        tr
+          td(colspan="2") Total
+          td.text-end= stock.totalQty
+          td.text-end= money(stock.totalValue)

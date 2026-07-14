@@ -1,0 +1,40 @@
+extends ../layout
+
+block content
+  .mb-3
+    h1.page-title Scrap Register
+    .text-muted.small
+      | Assets written off. They are hidden from every other page — this is where they live now.
+
+  .card: .table-responsive
+    table.table.table-hover.mb-0(data-table data-order='[[5,"desc"]]')
+      thead.table-light
+        tr
+          th Asset Tag
+          th Serial
+          th Type
+          th Make / Model
+          th Branch
+          th Scrapped On
+          th.text-end Purchase Cost
+          th.text-end Recovered
+          th.text-end Net Loss
+          th Reason
+          th.no-sort
+      tbody
+        if !assets.length
+          tr: td.text-center.text-muted.py-4(colspan="11") Nothing has been scrapped yet.
+        each a in assets
+          tr
+            td: span.mono.fw-medium= a.assetTag
+            td.mono.text-muted= a.serialNumber
+            td= a.category ? a.category.name : '—'
+            td= `${a.make} ${a.model}`
+            td= a.branch ? a.branch.name : '—'
+            td= date(a.scrappedAt)
+            td.text-end= money(a.purchaseCost)
+            td.text-end.text-success= money(a.scrapValue)
+            td.text-end.fw-semibold= money(Number(a.purchaseCost) - Number(a.scrapValue || 0))
+            td.small.text-muted= a.scrapReason || '—'
+            td.text-end
+              a.btn.btn-sm.btn-outline-secondary(href=`/reports/history/${a.id}`) History

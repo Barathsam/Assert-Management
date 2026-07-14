@@ -1,0 +1,117 @@
+extends ../layout
+
+block content
+  .d-flex.align-items-center.justify-content-between.mb-3
+    div
+      h1.page-title
+        | Asset History
+        |
+        span.mono.text-muted= asset.assetTag
+        |
+        span(class=`badge bg-${STATUS_BADGE[asset.status]}`)= STATUS_LABEL[asset.status]
+      .text-muted.small
+        = `${asset.make} ${asset.model}`
+        |  · #{asset.category ? asset.category.name : '—'} · Serial
+        span.mono= asset.serialNumber
+        |  · #{asset.branch ? asset.branch.name : '—'}
+    if asset.status !== 'SCRAPPED'
+      a.btn.btn-outline-secondary.btn-sm(href=`/assets/${asset.id}`) Back to Asset
+
+  if asset.status === 'SCRAPPED'
+    .card.scrapped-banner.mb-3: .card-body.py-2.small
+      i.bi.bi-trash.text-danger.me-2
+      strong Scrapped on #{date(asset.scrappedAt)}.
+      |  #{asset.scrapReason || ''}
+      |  This asset no longer appears on any operational page — this report is the record of it.
+
+  //- Requirement 8: the money first. What did it cost, what did we get back, and how much of the
+  //- time we owned it was it actually in someone's hands?
+  .row.g-3.mb-4
+    .col-6.col-lg
+      .card.kpi.h-100: .card-body
+        .kpi-label Purchase Cost
+        .kpi-value= money(totals.purchaseCost)
+        .kpi-sub= date(asset.purchaseDate)
+    .col-6.col-lg
+      .card.kpi.h-100: .card-body
+        .kpi-label Repair Cost
+        .kpi-value(class=totals.repairCost ? 'text-warning' : '')= money(totals.repairCost)
+        .kpi-sub= `${totals.repairCount} repair${totals.repairCount === 1 ? '' : 's'}`
+    .col-6.col-lg
+      .card.kpi.h-100: .card-body
+        .kpi-label Scrap Value
+        .kpi-value(class=totals.scrapValue ? 'text-success' : 'text-muted')= totals.scrapValue ? money(totals.scrapValue) : '—'
+        .kpi-sub recovered
+    .col-6.col-lg
+      .card.kpi.h-100.border-dark: .card-body
+        .kpi-label Net Cost
+        .kpi-value= money(totals.netCost)
+        .kpi-sub purchase + repairs − scrap
+    .col-6.col-lg
+      .card.kpi.h-100: .card-body
+        .kpi-label Days Owned
+        .kpi-value= totals.daysOwned
+        .kpi-sub= `since ${date(asset.purchaseDate)}`
+    .col-6.col-lg
+      .card.kpi.h-100: .card-body
+        .kpi-label Days Issued
+        .kpi-value= totals.daysIssued
+        .kpi-sub= `${totals.utilisationPct}% of its life in use`
+
+  .row.g-3
+    .col-lg-7
+      .card
+        .card-header.bg-white.fw-semibold Timeline
+        .card-body
+          //- The literal reading of requirement 8: every event from purchase to scrap, in order,
+          //- with its date and its amount.
+          .timeline
+            each t in timeline
+              .timeline-item(class=`ev-${t.txnType}`)
+                .d-flex.justify-content-between.align-items-start
+                  div
+                    .fw-semibold
+                      = TXN_LABEL[t.txnType]
+                      if t.employee
+                        span.fw-normal
+                          |  — #{t.employee.firstName} #{t.employee.lastName}
+                          span.text-muted.mono.ms-1= `(${t.employee.employeeCode})`
+                      if t.returnReason
+                        span.badge.bg-light.text-dark.ms-2= RETURN_REASON_LABEL[t.returnReason]
+                    .small.text-muted
+                      = date(t.txnAt)
+                      if t.vendor
+                        |  · #{t.vendor}
+                      if t.remarks
+                        |  · #{t.remarks}
+                  if t.amount
+                    .fw-semibold.text-nowrap.ms-3
+                      = t.txnType === 'SCRAP' ? '+ ' : ''
+                      = money(t.amount)
+
+    .col-lg-5
+      .card
+        .card-header.bg-white.fw-semibold Who Held It
+        .table-responsive
+          table.table.table-sm.mb-0
+            thead.table-light
+              tr
+                th Employee
+                th From
+                th To
+                th.text-end Days
+            tbody
+              if !holdings.length
+                tr: td.text-center.text-muted.py-4(colspan="4") Never issued to anyone.
+              each h in holdings
+                tr
+                  td
+                    a(href=`/employees/${h.employeeId}`)= h.employeeName
+                    .text-muted.mono.small= h.employeeCode
+                  td.small= date(h.issuedAt)
+                  td.small
+                    if h.returnedAt
+                      = date(h.returnedAt)
+                    else
+                      span.badge.bg-primary Holding
+                  td.text-end= h.days

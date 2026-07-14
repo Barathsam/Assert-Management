@@ -1,0 +1,31 @@
+extends ../layout
+
+block content
+  .mb-3
+    h1.page-title Issue Asset
+    .text-muted.small Pick an asset to issue. Only assets currently in stock can be issued.
+
+  .card: .table-responsive
+    table.table.table-hover.mb-0(data-table data-order='[[0,"asc"]]')
+      thead.table-light
+        tr
+          th Asset Tag
+          th Serial
+          th Type
+          th Make / Model
+          th Branch
+          th.text-end Cost
+          th.no-sort.text-end
+      tbody
+        if !assets.length
+          tr: td.text-center.text-muted.py-4(colspan="7") Nothing is in stock right now.
+        each a in assets
+          tr
+            td: span.mono.fw-medium= a.assetTag
+            td.mono.text-muted= a.serialNumber
+            td= a.category ? a.category.name : '—'
+            td= `${a.make} ${a.model}`
+            td= a.branch ? a.branch.name : '—'
+            td.text-end= money(a.purchaseCost)
+            td.text-end
+              a.btn.btn-sm.btn-primary(href=`/assets/${a.id}/issue`) Issue

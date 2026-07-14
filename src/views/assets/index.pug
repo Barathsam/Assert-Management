@@ -1,0 +1,79 @@
+extends ../layout
+
+block content
+  .d-flex.align-items-center.justify-content-between.mb-3
+    div
+      h1.page-title Assets
+      .text-muted.small Scrapped assets are not listed here — see Reports → Scrap Register.
+    a.btn.btn-primary.btn-sm(href="/assets/new")
+      i.bi.bi-plus-lg.me-1
+      | Add Asset
+
+  //- Requirement 2: filter by asset type, search by make/model (and serial/tag, which is what
+  //- a store keeper actually has in their hand).
+  .card.mb-3: .card-body.py-3
+    form.row.g-2.align-items-end(method="get")
+      .col-md-3
+        label.form-label.small.fw-semibold Asset Type
+        select.form-select.form-select-sm(name="categoryId" onchange="this.form.submit()")
+          option(value="") All types
+          each c in categories
+            option(value=c.id selected=(filters.categoryId === c.id))= c.name
+      .col-md-2
+        label.form-label.small.fw-semibold Status
+        select.form-select.form-select-sm(name="status" onchange="this.form.submit()")
+          option(value="") All
+          each s in statuses
+            option(value=s selected=(filters.status === s))= STATUS_LABEL[s]
+      .col-md-2
+        label.form-label.small.fw-semibold Branch
+        select.form-select.form-select-sm(name="branchId" onchange="this.form.submit()")
+          option(value="") All branches
+          each b in branches
+            option(value=b.id selected=(filters.branchId === b.id))= b.name
+      .col-md-3
+        label.form-label.small.fw-semibold Search
+        input.form-control.form-control-sm(name="q" value=filters.q placeholder="Make, model, serial, tag…")
+      .col-md-2
+        button.btn.btn-secondary.btn-sm.w-100(type="submit") Apply
+
+  .card: .table-responsive
+    table.table.table-hover.mb-0(data-table data-order='[[0,"desc"]]')
+      thead.table-light
+        tr
+          th Asset Tag
+          th Serial No
+          th Type
+          th Make / Model
+          th Branch
+          th Status
+          th Held By
+          th.text-end Cost
+          th.no-sort.text-end Actions
+      tbody
+        each a in assets
+          tr
+            td: a.mono.fw-medium(href=`/assets/${a.id}`)= a.assetTag
+            td.mono.text-muted= a.serialNumber
+            td= a.category ? a.category.name : '—'
+            td
+              .fw-medium= a.make
+              .text-muted.small= a.model
+            td= a.branch ? a.branch.name : '—'
+            td: span(class=`badge bg-${STATUS_BADGE[a.status]}`)= STATUS_LABEL[a.status]
+            td
+              if a.holder
+                a(href=`/employees/${a.holder.id}`)= `${a.holder.firstName} ${a.holder.lastName}`
+              else
+                span.text-muted —
+            td.text-end= money(a.purchaseCost)
+            td.text-end.text-nowrap
+              //- Actions are contextual: you can only do what the asset's current state allows.
+              if a.status === 'IN_STOCK'
+                a.btn.btn-sm.btn-primary(href=`/assets/${a.id}/issue`) Issue
+              else if a.status === 'ISSUED'
+                a.btn.btn-sm.btn-success(href=`/assets/${a.id}/return`) Return
+              else if a.status === 'IN_REPAIR'
+                a.btn.btn-sm.btn-warning(href=`/assets/${a.id}/repair-complete`) Repaired
+              a.btn.btn-sm.btn-outline-secondary.ms-1(href=`/reports/history/${a.id}` title="History")
+                i.bi.bi-clock-history

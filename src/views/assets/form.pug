@@ -1,0 +1,82 @@
+extends ../layout
+
+block content
+  .row.justify-content-center
+    .col-lg-9
+      h1.page-title.mb-1= title
+      if !asset
+        p.text-muted.small Adding an asset records its purchase — it enters stock and its cost is the first entry in its history.
+      .card: .card-body
+        form(method="post" action=asset ? `/assets/${asset.id}` : '/assets' data-once)
+
+          if asset
+            .mb-3
+              label.form-label Asset Tag
+              input.form-control.mono(value=asset.assetTag disabled)
+              .form-text This is the asset's unique id. It is generated on purchase and never changes.
+
+          .row
+            .col-md-4.mb-3
+              label.form-label Serial Number *
+              input.form-control.mono(name="serialNumber" required value=asset ? asset.serialNumber : '')
+              .form-text Must be unique across all assets.
+            .col-md-4.mb-3
+              label.form-label Category *
+              select.form-select(name="categoryId" required)
+                option(value="") Select…
+                each c in categories
+                  option(value=c.id selected=(asset && asset.categoryId === c.id))= c.name
+            .col-md-4.mb-3
+              label.form-label Branch *
+              select.form-select(name="branchId" required)
+                option(value="") Select…
+                each b in branches
+                  option(value=b.id selected=(asset && asset.branchId === b.id))= b.name
+              .form-text The branch that owns it — Stock View totals group on this.
+
+          .row
+            .col-md-4.mb-3
+              label.form-label Make *
+              input.form-control(name="make" required value=asset ? asset.make : '' placeholder="Dell")
+            .col-md-4.mb-3
+              label.form-label Model *
+              input.form-control(name="model" required value=asset ? asset.model : '' placeholder="Latitude 5420")
+            .col-md-4.mb-3
+              label.form-label Specification
+              input.form-control(name="specification" value=asset ? asset.specification || '' : '' placeholder="i5 / 16GB / 512GB")
+
+          hr.my-3
+          h2.h6.text-muted.text-uppercase.small.fw-semibold.mb-3 Purchase
+
+          .row
+            .col-md-3.mb-3
+              label.form-label Purchase Date *
+              if asset
+                input.form-control(type="date" value=asset.purchaseDate disabled)
+                .form-text.text-muted Purchase details are part of the asset's history and cannot be edited.
+              else
+                input.form-control(type="date" name="purchaseDate" required value=today max=today)
+            .col-md-3.mb-3
+              label.form-label Purchase Cost (₹) *
+              if asset
+                input.form-control(value=asset.purchaseCost disabled)
+              else
+                input.form-control(type="number" name="purchaseCost" required min="0" step="0.01" placeholder="82000")
+            .col-md-3.mb-3
+              label.form-label Vendor
+              input.form-control(name="vendor" value=asset ? asset.vendor || '' : '')
+            .col-md-3.mb-3
+              label.form-label Invoice No
+              input.form-control(name="invoiceNo" value=asset ? asset.invoiceNo || '' : '')
+
+          .row
+            .col-md-3.mb-3
+              label.form-label Warranty Expiry
+              input.form-control(type="date" name="warrantyExpiry" value=asset && asset.warrantyExpiry ? asset.warrantyExpiry : '')
+            .col-md-9.mb-3
+              label.form-label Notes
+              input.form-control(name="notes" value=asset ? asset.notes || '' : '')
+
+          .d-flex.justify-content-end.gap-2
+            a.btn.btn-outline-secondary(href=asset ? `/assets/${asset.id}` : '/assets') Cancel
+            button.btn.btn-primary(type="submit")= asset ? 'Save Changes' : 'Add Asset'

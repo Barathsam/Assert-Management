@@ -1,0 +1,67 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="utf-8")
+    meta(name="viewport" content="width=device-width, initial-scale=1")
+    title #{title} · Asset Management
+    link(rel="stylesheet" href="/vendor/bootstrap/css/bootstrap.min.css")
+    link(rel="stylesheet" href="/vendor/bootstrap-icons/bootstrap-icons.css")
+    link(rel="stylesheet" href="/vendor/datatables/css/dataTables.bootstrap5.min.css")
+    link(rel="stylesheet" href="/css/app.css")
+  body
+    nav.navbar.navbar-expand-lg.navbar-dark.bg-dark.mb-4
+      .container-fluid
+        a.navbar-brand.fw-semibold(href="/")
+          i.bi.bi-box-seam.me-2
+          | Asset Management
+        button.navbar-toggler(type="button" data-bs-toggle="collapse" data-bs-target="#nav")
+          span.navbar-toggler-icon
+        #nav.collapse.navbar-collapse
+          ul.navbar-nav.me-auto
+            li.nav-item
+              a.nav-link(href="/" class=(currentPath === '/' ? 'active' : '')) Dashboard
+            li.nav-item
+              a.nav-link(href="/assets" class=(currentPath.startsWith('/assets') ? 'active' : '')) Assets
+            li.nav-item
+              a.nav-link(href="/employees" class=(currentPath.startsWith('/employees') ? 'active' : '')) Employees
+            li.nav-item
+              a.nav-link(href="/stock" class=(currentPath.startsWith('/stock') ? 'active' : '')) Stock
+            li.nav-item
+              a.nav-link(href="/issue" class=(currentPath === '/issue' ? 'active' : '')) Issue
+            li.nav-item
+              a.nav-link(href="/return" class=(currentPath === '/return' ? 'active' : '')) Return
+            li.nav-item
+              a.nav-link(href="/scrap" class=(currentPath === '/scrap' ? 'active' : '')) Scrap
+            li.nav-item.dropdown
+              a.nav-link.dropdown-toggle(href="#" data-bs-toggle="dropdown") Reports
+              ul.dropdown-menu
+                li: a.dropdown-item(href="/reports/scrapped") Scrap Register
+                li: a.dropdown-item(href="/reports/ledger") Transaction Ledger
+                li: hr.dropdown-divider
+                li: a.dropdown-item(href="/reports/integrity") Ledger Integrity
+            li.nav-item.dropdown
+              a.nav-link.dropdown-toggle(href="#" data-bs-toggle="dropdown") Masters
+              ul.dropdown-menu
+                li: a.dropdown-item(href="/categories") Asset Categories
+                li: a.dropdown-item(href="/branches") Branches
+
+    .container-fluid.px-4
+      each msg in success
+        .alert.alert-success.alert-dismissible.fade.show
+          i.bi.bi-check-circle.me-2
+          = msg
+          button.btn-close(type="button" data-bs-dismiss="alert")
+      each msg in error
+        .alert.alert-danger.alert-dismissible.fade.show
+          i.bi.bi-exclamation-triangle.me-2
+          = msg
+          button.btn-close(type="button" data-bs-dismiss="alert")
+
+      block content
+
+    script(src="/vendor/jquery/jquery.min.js")
+    script(src="/vendor/bootstrap/js/bootstrap.bundle.min.js")
+    script(src="/vendor/datatables-core/js/dataTables.min.js")
+    script(src="/vendor/datatables/js/dataTables.bootstrap5.min.js")
+    script(src="/js/app.js")
+    block scripts

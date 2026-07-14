@@ -1,0 +1,64 @@
+extends ../layout
+
+block content
+  .d-flex.align-items-center.justify-content-between.mb-3
+    div
+      h1.page-title
+        span.mono= asset.assetTag
+        |
+        span(class=`badge bg-${STATUS_BADGE[asset.status]}`)= STATUS_LABEL[asset.status]
+      .text-muted.small
+        = `${asset.make} ${asset.model}`
+        |  · Serial
+        span.mono= asset.serialNumber
+    div
+      //- Only the actions this asset's current state actually permits.
+      if asset.status === 'IN_STOCK'
+        a.btn.btn-primary.btn-sm(href=`/assets/${asset.id}/issue`) Issue
+        a.btn.btn-outline-warning.btn-sm.ms-1(href=`/assets/${asset.id}/send-to-repair`) Send to Repair
+      else if asset.status === 'ISSUED'
+        a.btn.btn-success.btn-sm(href=`/assets/${asset.id}/return`) Return
+      else if asset.status === 'IN_REPAIR'
+        a.btn.btn-warning.btn-sm(href=`/assets/${asset.id}/repair-complete`) Repair Complete
+      a.btn.btn-outline-secondary.btn-sm.ms-1(href=`/assets/${asset.id}/edit`) Edit
+      a.btn.btn-outline-secondary.btn-sm.ms-1(href=`/reports/history/${asset.id}`) History
+      a.btn.btn-outline-danger.btn-sm.ms-1(href=`/assets/${asset.id}/scrap`) Scrap
+
+  .row.g-3
+    .col-lg-7
+      .card: .card-body
+        h2.h6.text-muted.text-uppercase.small.fw-semibold Asset
+        dl.row.mb-0.small
+          dt.col-4.text-muted Category
+          dd.col-8= asset.category ? asset.category.name : '—'
+          dt.col-4.text-muted Make / Model
+          dd.col-8= `${asset.make} ${asset.model}`
+          dt.col-4.text-muted Specification
+          dd.col-8= asset.specification || '—'
+          dt.col-4.text-muted Branch
+          dd.col-8= asset.branch ? asset.branch.name : '—'
+          dt.col-4.text-muted Currently With
+          dd.col-8
+            if asset.holder
+              a(href=`/employees/${asset.holder.id}`)= `${asset.holder.firstName} ${asset.holder.lastName}`
+              span.text-muted.mono.ms-1= `(${asset.holder.employeeCode})`
+            else
+              span.text-muted Not issued
+          if asset.notes
+            dt.col-4.text-muted Notes
+            dd.col-8= asset.notes
+
+    .col-lg-5
+      .card: .card-body
+        h2.h6.text-muted.text-uppercase.small.fw-semibold Purchase
+        dl.row.mb-0.small
+          dt.col-5.text-muted Purchase Date
+          dd.col-7= date(asset.purchaseDate)
+          dt.col-5.text-muted Purchase Cost
+          dd.col-7.fw-semibold= money(asset.purchaseCost)
+          dt.col-5.text-muted Vendor
+          dd.col-7= asset.vendor || '—'
+          dt.col-5.text-muted Invoice No
+          dd.col-7= asset.invoiceNo || '—'
+          dt.col-5.text-muted Warranty Till
+          dd.col-7= date(asset.warrantyExpiry)

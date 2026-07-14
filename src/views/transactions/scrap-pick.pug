@@ -1,0 +1,33 @@
+extends ../layout
+
+block content
+  .mb-3
+    h1.page-title Scrap Asset
+    .text-muted.small
+      | Mark an asset obsolete. It will vanish from every operational page — only Reports will
+      |  still show it.
+
+  .card: .table-responsive
+    table.table.table-hover.mb-0(data-table data-order='[[0,"asc"]]')
+      thead.table-light
+        tr
+          th Asset Tag
+          th Serial
+          th Make / Model
+          th Status
+          th Held By
+          th.text-end Cost
+          th.no-sort.text-end
+      tbody
+        if !assets.length
+          tr: td.text-center.text-muted.py-4(colspan="7") No assets.
+        each a in assets
+          tr
+            td: span.mono.fw-medium= a.assetTag
+            td.mono.text-muted= a.serialNumber
+            td= `${a.make} ${a.model}`
+            td: span(class=`badge bg-${STATUS_BADGE[a.status]}`)= STATUS_LABEL[a.status]
+            td= a.holder ? `${a.holder.firstName} ${a.holder.lastName}` : '—'
+            td.text-end= money(a.purchaseCost)
+            td.text-end
+              a.btn.btn-sm.btn-outline-danger(href=`/assets/${a.id}/scrap`) Scrap

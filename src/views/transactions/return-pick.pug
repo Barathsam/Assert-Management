@@ -1,0 +1,31 @@
+extends ../layout
+
+block content
+  .mb-3
+    h1.page-title Return Asset
+    .text-muted.small Pick an asset to take back. Only assets currently issued to someone are listed.
+
+  .card: .table-responsive
+    table.table.table-hover.mb-0(data-table data-order='[[0,"asc"]]')
+      thead.table-light
+        tr
+          th Asset Tag
+          th Serial
+          th Make / Model
+          th Held By
+          th Branch
+          th.no-sort.text-end
+      tbody
+        if !assets.length
+          tr: td.text-center.text-muted.py-4(colspan="6") No assets are currently issued.
+        each a in assets
+          tr
+            td: span.mono.fw-medium= a.assetTag
+            td.mono.text-muted= a.serialNumber
+            td= `${a.make} ${a.model}`
+            td
+              if a.holder
+                a(href=`/employees/${a.holder.id}`)= `${a.holder.firstName} ${a.holder.lastName}`
+            td= a.branch ? a.branch.name : '—'
+            td.text-end
+              a.btn.btn-sm.btn-success(href=`/assets/${a.id}/return`) Return
